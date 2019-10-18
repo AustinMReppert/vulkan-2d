@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(vulkan)
 
 # Specify the name of our application and its source files
-add_executable(vulkan main.cpp Window.h Window.cpp)
+add_executable(vulkan main.cpp Window.h Window.cpp SwapChainUtils.h)
 
 # Enable c++ 17
 target_compile_features(vulkan PUBLIC cxx_std_17)
