@@ -9,6 +9,8 @@
 #include "SwapChainUtils.h"
 
 #include <GLFW/glfw3.h>
+#include <set>
+#include <vector>
 
 bool DEBUG = true;
 
@@ -161,10 +163,14 @@ void pickDevice() {
 
   enableRequiredDeviceExtensions(physicalDevice);
 
-  std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos = {
-      vk::DeviceQueueCreateInfo({}, graphicsFamilyIndex, 1, nullptr),
-      vk::DeviceQueueCreateInfo({}, presentFamilyIndex, 1, nullptr)
-  };
+  std::set<std::size_t> uniqueQueueFamilies = {graphicsFamilyIndex, presentFamilyIndex};
+  std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
+  std::vector<float*> queuePriorities;
+  for(const auto& queueFamily : uniqueQueueFamilies) {
+    float priority = 1;
+    deviceQueueCreateInfos.push_back(vk::DeviceQueueCreateInfo({}, queueFamily, 1, &priority));
+  }
+
   logicalDevice = physicalDevice.createDeviceUnique(vk::DeviceCreateInfo({}, deviceQueueCreateInfos.size(),
                                                                          deviceQueueCreateInfos.data(),
                                                                          enabledLayers.size(), enabledLayers.data(), enabledDeviceExtensions.size(),
@@ -186,7 +192,7 @@ void createSwapChain() {
 
 void createWindow() {
   glfwInit();
-  window = std::make_unique<Window>(1920, 1080);
+  window = std::make_unique<Window>(800, 600);
 }
 
 void createSurface() {
