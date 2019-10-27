@@ -5,12 +5,17 @@
 
 class Window {
 
- public:
+public:
   Window();
+
   Window(int width, int height);
+
   ~Window();
-  GLFWwindow* glfwWindow;
+
+  GLFWwindow *glfwWindow;
+
   int getWidth();
+
   int getHeight();
 };
 

@@ -11,11 +11,12 @@ Window::Window() {
   glfwWindowHint(GLFW_MAXIMIZED, true);
   glfwWindow = glfwCreateWindow(200, 200, "Vulkan", nullptr, nullptr);
 }
+
 Window::Window(int width, int height) {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, true);
   glfwWindowHint(GLFW_FLOATING, false);
-  glfwWindowHint(GLFW_MAXIMIZED, true);
+  glfwWindowHint(GLFW_MAXIMIZED, false);
   glfwWindow = glfwCreateWindow(width, height, "Vulkan", nullptr, nullptr);
 }
 

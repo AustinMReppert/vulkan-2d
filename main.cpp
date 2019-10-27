@@ -12,7 +12,7 @@
 #include <set>
 #include <vector>
 
-bool DEBUG = true;
+bool DEBUG = false;
 
 vk::UniqueInstance vkInstance;
 vk::PhysicalDevice physicalDevice;
@@ -20,23 +20,36 @@ vk::UniqueDevice logicalDevice;
 std::vector<const char *> enabledExtensions;
 std::vector<const char *> enabledDeviceExtensions;
 std::vector<const char *> enabledLayers;
+std::vector<vk::Image> swapChainImages;
 vk::Queue graphicsQueue;
 vk::Queue presentQueue;
 vk::SurfaceKHR surface;
 vk::UniqueSurfaceKHR uniqueSurface;
+vk::UniqueSwapchainKHR swapChain;
 
 SwapChainSupportDetails swapChainSupportDetails;
+
+uint32_t graphicsQueueFamilyIndex;
+uint32_t presentQueueFamilyIndex;
 
 std::unique_ptr<Window> window;
 
 void initVk();
+
 void enableRequiredExtensions();
+
 void enableRequiredDeviceExtensions(vk::PhysicalDevice device);
+
 void enableRequiredLayers();
+
 void pickDevice();
+
 void createWindow();
+
 void createSurface();
+
 void createSwapChain();
+
 void cleanup();
 
 void initVk() {
@@ -46,7 +59,7 @@ void initVk() {
     vk::InstanceCreateInfo createInfo({}, &applicationInfo, enabledLayers.size(), enabledLayers.data(),
                                       enabledExtensions.size(), enabledExtensions.data());
     vkInstance = vk::createInstanceUnique(createInfo);
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     std::cerr << e.what() << std::endl;
     exit(-1);
   }
@@ -57,34 +70,34 @@ void enableRequiredDeviceExtensions(vk::PhysicalDevice device) {
   enabledDeviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
   std::vector<vk::ExtensionProperties> deviceExtensions = device.enumerateDeviceExtensionProperties();
-  std::vector<const char*> deviceExtensionNames(deviceExtensions.size());
+  std::vector<const char *> deviceExtensionNames(deviceExtensions.size());
   std::transform(deviceExtensions.begin(), deviceExtensions.end(), deviceExtensionNames.begin(),
-                 [](const auto &i) -> const char* { return i.extensionName; });
+                 [](const auto& i) -> const char * { return i.extensionName; });
 
   std::cout << "Supported device extensions:" << std::endl;
-  for (const auto &ext : deviceExtensions)
+  for (const auto& ext : deviceExtensions)
     std::cout << "\t" << ext.extensionName << std::endl;
 
   auto unsupportedExtensions = enabledDeviceExtensions;
   unsupportedExtensions.erase(std::remove_if(unsupportedExtensions.begin(),
                                              unsupportedExtensions.end(),
-                                             [=](const auto &i) {
+                                             [=](const auto& i) {
                                                return
                                                    std::find_if(deviceExtensionNames.begin(),
                                                                 deviceExtensionNames.end(),
-                                                                [=](const auto &deviceExtensionName) {
+                                                                [=](const auto& deviceExtensionName) {
                                                                   return !std::strcmp(i, deviceExtensionName);
                                                                 }) != deviceExtensionNames.end();
                                              }), unsupportedExtensions.end());
   std::cout << "Unsupported Device Extensions:" << std::endl;
-  for (const auto &i : unsupportedExtensions)
+  for (const auto& i : unsupportedExtensions)
     std::cout << "\t" << i << std::endl;
 }
 
 void enableRequiredExtensions() {
   std::vector<vk::ExtensionProperties> supportedExtensions = vk::enumerateInstanceExtensionProperties();
   std::cout << "supported extensions:" << std::endl;
-  for (const auto &ext : supportedExtensions)
+  for (const auto& ext : supportedExtensions)
     std::cout << "\t" << ext.extensionName << std::endl;
 
   std::size_t numExtensions = 0;
@@ -92,12 +105,12 @@ void enableRequiredExtensions() {
   for (std::size_t i = 0; i < numExtensions; ++i)
     enabledExtensions.push_back(glfwExtensions[i]);
   std::cout << "GLFW requested the following extensions: " << std::endl;
-  for (const auto &ext : enabledExtensions)
+  for (const auto& ext : enabledExtensions)
     std::cout << "\t" << ext << std::endl;
 
-  for (const auto &reqExt : enabledExtensions) {
+  for (const auto& reqExt : enabledExtensions) {
     bool found = false;
-    for (const auto &ext : supportedExtensions) {
+    for (const auto& ext : supportedExtensions) {
       if (!std::strcmp(ext.extensionName, reqExt)) {
         found = true;
         break;
@@ -115,7 +128,7 @@ void enableRequiredLayers() {
   if (DEBUG) enabledLayers.push_back("VK_LAYER_LUNARG_standard_validation");
   std::vector<vk::LayerProperties> vkLayerProps = vk::enumerateInstanceLayerProperties();
   std::cout << "Supported Layers:" << std::endl;
-  for (const auto &layerProps : vkLayerProps)
+  for (const auto& layerProps : vkLayerProps)
     std::cout << "\t" << layerProps.layerName << std::endl;
 }
 
@@ -123,7 +136,7 @@ void pickDevice() {
   auto physicalDevices = vkInstance->enumeratePhysicalDevices();
   physicalDevices.erase(std::remove_if(physicalDevices.begin(),
                                        physicalDevices.end(),
-                                       [](const auto &physicalDevice) {
+                                       [](const auto& physicalDevice) {
                                          return physicalDevice.getProperties().deviceType !=
                                                 vk::PhysicalDeviceType::eDiscreteGpu;
                                        }),
@@ -131,7 +144,7 @@ void pickDevice() {
 
   physicalDevice = physicalDevices.front();
   std::cout << "Physical Devices: " << std::endl;
-  for (auto &device : physicalDevices)
+  for (auto& device : physicalDevices)
     std::cout << "\t" << device.getProperties().deviceName << std::endl;
 
   std::vector<vk::QueueFamilyProperties> queueFamilyProps = physicalDevice.getQueueFamilyProperties();
@@ -152,7 +165,8 @@ void pickDevice() {
   std::cout << "Queue Families:" << std::endl;
   for (std::size_t i = 0; i < queueFamilyProps.size(); ++i) {
     std::cout << "\tindex: " << i << std::endl;
-    std::cout << "\tgraphics: " << static_cast<bool>(queueFamilyProps[i].queueFlags & vk::QueueFlagBits::eGraphics) << std::endl;
+    std::cout << "\tgraphics: " << static_cast<bool>(queueFamilyProps[i].queueFlags & vk::QueueFlagBits::eGraphics)
+              << std::endl;
     std::cout << "\tpresentation: " << physicalDevice.getSurfaceSupportKHR(i, uniqueSurface.get()) << std::endl;
   }
   if (graphicsFamilyIndex >= queueFamilyProps.size() || presentFamilyIndex >= queueFamilyProps.size()) {
@@ -161,19 +175,22 @@ void pickDevice() {
     exit(-1);
   }
 
-  enableRequiredDeviceExtensions(physicalDevice);
+  graphicsQueueFamilyIndex = graphicsFamilyIndex;
+  presentQueueFamilyIndex = presentFamilyIndex;
 
+  enableRequiredDeviceExtensions(physicalDevice);
   std::set<std::size_t> uniqueQueueFamilies = {graphicsFamilyIndex, presentFamilyIndex};
   std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
-  std::vector<float*> queuePriorities;
-  for(const auto& queueFamily : uniqueQueueFamilies) {
+  std::vector<float *> queuePriorities;
+  for (const auto& queueFamily : uniqueQueueFamilies) {
     float priority = 1;
     deviceQueueCreateInfos.push_back(vk::DeviceQueueCreateInfo({}, queueFamily, 1, &priority));
   }
 
   logicalDevice = physicalDevice.createDeviceUnique(vk::DeviceCreateInfo({}, deviceQueueCreateInfos.size(),
                                                                          deviceQueueCreateInfos.data(),
-                                                                         enabledLayers.size(), enabledLayers.data(), enabledDeviceExtensions.size(),
+                                                                         enabledLayers.size(), enabledLayers.data(),
+                                                                         enabledDeviceExtensions.size(),
                                                                          enabledDeviceExtensions.data()));
 
   graphicsQueue = logicalDevice->getQueue(graphicsFamilyIndex, 0);
@@ -188,15 +205,29 @@ void createSwapChain() {
   swapChainSupportDetails = SwapChainUtils::getSwapChainSupport(physicalDevice, uniqueSurface);
   vk::Extent2D optimalExtent = SwapChainUtils::getOptimalExtent(swapChainSupportDetails, preferredExtent);
   vk::PresentModeKHR optimalPresentMode = SwapChainUtils::getOptimalPresentMode(swapChainSupportDetails);
+  vk::SurfaceFormatKHR optimalSurfaceFormat = SwapChainUtils::getOptimalSurfaceFormat(swapChainSupportDetails);
+
   std::cout << "Supported Present Modes:" << std::endl;
-  for(const auto& presentMode : swapChainSupportDetails.presentModes)
+  for (const auto& presentMode : swapChainSupportDetails.presentModes)
     std::cout << "\t" << vk::to_string(presentMode) << std::endl;
   std::cout << "Supported Surface Formats:" << std::endl;
-  for(const auto& format : swapChainSupportDetails.formats) {
+  for (const auto& format : swapChainSupportDetails.formats) {
     std::cout << "\tformat: " << vk::to_string(format.format) << std::endl;
     std::cout << "\tcolor space: " << vk::to_string(format.colorSpace) << std::endl;
   }
-  vk::SurfaceFormatKHR optimalSurfaceFormat = SwapChainUtils::getOptimalSurfaceFormat(swapChainSupportDetails);
+
+  std::cout << "Selected Surface Extent: " << optimalExtent.width << " X " << optimalExtent.height << std::endl;
+  std::cout << "Selected Surface Present Mode: " << vk::to_string(optimalPresentMode) << std::endl;
+  std::cout << "Selected Surface Color Space: " << vk::to_string(optimalSurfaceFormat.colorSpace) << std::endl;
+  std::cout << "Selected Surface Format: " << vk::to_string(optimalSurfaceFormat.format)<< std::endl;
+
+  swapChain = SwapChainUtils::createSwapChain(logicalDevice, swapChainSupportDetails, uniqueSurface, optimalPresentMode,
+                                              optimalSurfaceFormat, optimalExtent, graphicsQueueFamilyIndex,
+                                              presentQueueFamilyIndex);
+  for(const auto& swapChainImage : logicalDevice->getSwapchainImagesKHR(swapChain.get()))
+    swapChainImages.push_back(swapChainImage);
+  std::cout << "Swap Chain created " << std::endl;
+  std::cout << "Received " << swapChainImages.size() << " images for the swap chain" << std::endl;
 }
 
 void createWindow() {
