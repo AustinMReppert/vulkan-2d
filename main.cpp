@@ -149,11 +149,11 @@ void pickDevice() {
     }
     if (supportsGraphics && supportsPresenting) break;
   }
-  std::cout << "Queues:" << std::endl;
+  std::cout << "Queue Families:" << std::endl;
   for (std::size_t i = 0; i < queueFamilyProps.size(); ++i) {
-    std::cout << "\t" << i << std::endl;
-    std::cout << "\t\tgraphics: " << static_cast<bool>(queueFamilyProps[i].queueFlags & vk::QueueFlagBits::eGraphics) << std::endl;
-    std::cout << "\t\tpresentation: " << physicalDevice.getSurfaceSupportKHR(i, uniqueSurface.get()) << std::endl;
+    std::cout << "\tindex: " << i << std::endl;
+    std::cout << "\tgraphics: " << static_cast<bool>(queueFamilyProps[i].queueFlags & vk::QueueFlagBits::eGraphics) << std::endl;
+    std::cout << "\tpresentation: " << physicalDevice.getSurfaceSupportKHR(i, uniqueSurface.get()) << std::endl;
   }
   if (graphicsFamilyIndex >= queueFamilyProps.size() || presentFamilyIndex >= queueFamilyProps.size()) {
     std::cerr << "Could not find a queue family supporting graphics and/or presenting." << std::endl;
@@ -184,10 +184,19 @@ void pickDevice() {
 }
 
 void createSwapChain() {
+  vk::Extent2D preferredExtent(window->getWidth(), window->getHeight());
   swapChainSupportDetails = SwapChainUtils::getSwapChainSupport(physicalDevice, uniqueSurface);
-  std::cout << UINT32_MAX << std::endl;
-  std::cout << swapChainSupportDetails.capabilities.maxImageExtent.width << std::endl;
-  std::cout << swapChainSupportDetails.capabilities.maxImageExtent.height << std::endl;
+  vk::Extent2D optimalExtent = SwapChainUtils::getOptimalExtent(swapChainSupportDetails, preferredExtent);
+  vk::PresentModeKHR optimalPresentMode = SwapChainUtils::getOptimalPresentMode(swapChainSupportDetails);
+  std::cout << "Supported Present Modes:" << std::endl;
+  for(const auto& presentMode : swapChainSupportDetails.presentModes)
+    std::cout << "\t" << vk::to_string(presentMode) << std::endl;
+  std::cout << "Supported Surface Formats:" << std::endl;
+  for(const auto& format : swapChainSupportDetails.formats) {
+    std::cout << "\tformat: " << vk::to_string(format.format) << std::endl;
+    std::cout << "\tcolor space: " << vk::to_string(format.colorSpace) << std::endl;
+  }
+  vk::SurfaceFormatKHR optimalSurfaceFormat = SwapChainUtils::getOptimalSurfaceFormat(swapChainSupportDetails);
 }
 
 void createWindow() {
@@ -220,7 +229,6 @@ int main() {
   createSurface();
   pickDevice();
   createSwapChain();
-
   while (!glfwWindowShouldClose(window->glfwWindow)) {
     glfwPollEvents();
   }
