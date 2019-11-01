@@ -2,8 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include <iostream>
-
 Window::Window() {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, false);
@@ -12,12 +10,12 @@ Window::Window() {
   glfwWindow = glfwCreateWindow(200, 200, "Vulkan", nullptr, nullptr);
 }
 
-Window::Window(int width, int height) {
+Window::Window(uint32_t width, uint32_t height) {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, true);
   glfwWindowHint(GLFW_FLOATING, false);
   glfwWindowHint(GLFW_MAXIMIZED, false);
-  glfwWindow = glfwCreateWindow(width, height, "Vulkan", nullptr, nullptr);
+  glfwWindow = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), "Vulkan", nullptr, nullptr);
 }
 
 
@@ -25,14 +23,14 @@ Window::~Window() {
   glfwDestroyWindow(glfwWindow);
 }
 
-int Window::getWidth() {
+uint32_t Window::getWidth() {
   int width, height;
   glfwGetWindowSize(glfwWindow, &width, &height);
-  return width;
+  return static_cast<uint32_t>(width);
 }
 
-int Window::getHeight() {
+uint32_t Window::getHeight() {
   int width, height;
   glfwGetWindowSize(glfwWindow, &width, &height);
-  return height;
+  return static_cast<uint32_t>(height);
 }

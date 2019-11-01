@@ -13,6 +13,17 @@ class SwapChainUtils {
 
 public:
 
+  static std::vector<vk::UniqueImageView>
+  getImageViews(const vk::UniqueDevice& device, const std::vector<vk::Image>& images, vk::Format format) {
+    std::vector<vk::UniqueImageView> imageViews(images.size());
+    for (const auto& image : images) {
+      vk::ImageViewCreateInfo createInfo = {{}, image, vk::ImageViewType::e2D, format, {},
+                                            {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}};
+      imageViews.push_back(device->createImageViewUnique(createInfo));
+    }
+    return imageViews;
+  }
+
   static vk::UniqueSwapchainKHR
   createSwapChain(const vk::UniqueDevice& device,
                   const SwapChainSupportDetails& swapChainSupportDetails, const vk::UniqueSurfaceKHR& surface,
@@ -35,7 +46,7 @@ public:
                                              sharedQueues ? nullptr : queueFamilyIndices.data(),
                                              swapChainSupportDetails.capabilities.currentTransform,
                                              vk::CompositeAlphaFlagBitsKHR::eOpaque,
-                                             presentMode, true, nullptr
+                                             presentMode, VK_TRUE, nullptr
     };
     vk::UniqueSwapchainKHR swapChain;
     try {
@@ -87,7 +98,7 @@ public:
 
 private:
   static constexpr std::array<std::pair<vk::PresentModeKHR, uint32_t>, 4> PRESENT_MODE_PRIORITIES = {
-      std::pair{vk::PresentModeKHR::eMailbox, 0},
+      std::pair<vk::PresentModeKHR, uint32_t>{vk::PresentModeKHR::eMailbox, 0},
       {vk::PresentModeKHR::eFifoRelaxed, 1},
       {vk::PresentModeKHR::eFifo, 2},
       {vk::PresentModeKHR::eImmediate, std::numeric_limits<uint32_t>::max()}};
@@ -95,4 +106,4 @@ private:
 };
 
 
-#endif //VULKAN_SWAPCHAINUTILS_H
+#endif

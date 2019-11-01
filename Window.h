@@ -8,15 +8,15 @@ class Window {
 public:
   Window();
 
-  Window(int width, int height);
+  Window(uint32_t width, uint32_t height);
 
   ~Window();
 
   GLFWwindow *glfwWindow;
 
-  int getWidth();
+  uint32_t getWidth();
 
-  int getHeight();
+  uint32_t getHeight();
 };
 
 #endif
