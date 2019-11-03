@@ -1,16 +1,14 @@
 # Make sure the user is useing an up to date cmake version
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
-
 # Specify the name of our project
 project(vulkan)
 
 # Specify the name of our application and its source files
-add_executable(vulkan main.cpp Window.h Window.cpp SwapChainUtils.h)
+add_executable(vulkan main.cpp Window.h Window.cpp SwapChainUtils.h DeviceUtils.h main.h VkUtils.h)
 
-# Enable c++ 17
-target_compile_features(vulkan PUBLIC cxx_std_17)
+# Enable c++ 20
+target_compile_features(vulkan PUBLIC cxx_std_20)
 
 # Add glm includes
 target_include_directories(vulkan PRIVATE glm)

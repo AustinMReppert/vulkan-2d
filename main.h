@@ -14,6 +14,7 @@
 #include "SwapChainUtils.h"
 
 #include <GLFW/glfw3.h>
+#include "VkUtils.h"
 #include <set>
 #include <vector>
 #include <experimental/vector>
