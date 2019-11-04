@@ -1,5 +1,5 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cert-err58-cpp"
+//#pragma clang diagnostic push
+//#pragma ide diagnostic ignored "cert-err58-cpp"
 #ifndef VULKAN_MAIN_H
 #define VULKAN_MAIN_H
 
@@ -36,6 +36,8 @@ vk::UniqueSwapchainKHR swapChain;
 vk::Extent2D optimalExtent;
 vk::PresentModeKHR optimalPresentMode;
 vk::SurfaceFormatKHR optimalSurfaceFormat;
+vk::UniqueShaderModule vertShaderModUnique;
+vk::UniqueShaderModule fragShaderModUnique;
 
 SwapChainSupportDetails swapChainSupportDetails;
 
@@ -60,10 +62,12 @@ void createSurface();
 
 void createSwapChain();
 
+void createShaders();
+
 void cleanup();
 
 int main();
 
 #endif
 
-#pragma clang diagnostic pop
+//#pragma clang diagnostic pop

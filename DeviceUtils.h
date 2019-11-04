@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <vector>
 #include <experimental/vector>
+#include <optional>
 
 class DeviceUtils {
 

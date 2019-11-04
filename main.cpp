@@ -1,5 +1,6 @@
 #include "main.h"
 #include "DeviceUtils.h"
+#include "ShaderUtils.h"
 
 #ifndef NDEBUG
 #define DEBUG
@@ -47,12 +48,12 @@ void enableRequiredDeviceExtensions(vk::PhysicalDevice device) {
                      }) != deviceExtensionNames.end();
   });
 
-  if (!unsupportedExtensions.empty())
-    std::cout << "Missing Device Extensions:" << std::endl;
-  for (const auto& i : unsupportedExtensions)
-    std::cout << "\t" << i << std::endl;
-  if (!unsupportedExtensions.empty())
+  if (!unsupportedExtensions.empty()) {
+    std::cerr << "Missing Device Extensions:" << std::endl;
+    for (const auto& i : unsupportedExtensions)
+      std::cerr << "\t" << i << std::endl;
     exit(-1);
+  }
 }
 
 void enableRequiredExtensions() {
@@ -225,7 +226,27 @@ void cleanup() {
   glfwTerminate();
 }
 
+void createShaders() {
+  std::unique_ptr<std::string> vertexSrc = ShaderUtils::load("..\\shaders\\vertex.vert");
+  std::unique_ptr<std::string> fragmentSrc = ShaderUtils::load("..\\shaders\\fragment.frag");
+
+  std::unique_ptr<std::string> vertexShaderPreprocessed = ShaderUtils::preprocess("vertex.vert", *vertexSrc,
+                                                                          shaderc_shader_kind::shaderc_vertex_shader);
+  std::unique_ptr<std::string> fragmentShaderPreprocessed = ShaderUtils::preprocess("fragment.frag", *fragmentSrc,
+                                                                          shaderc_shader_kind::shaderc_fragment_shader);
+
+  std::unique_ptr<std::vector<uint32_t>> vertexSpvByteCode = ShaderUtils::compile("vertex.vert", *vertexShaderPreprocessed,
+                                                                            shaderc_shader_kind::shaderc_vertex_shader, false);
+  std::unique_ptr<std::vector<uint32_t>> fragmentSpvByteCode = ShaderUtils::compile("fragment.frag", *fragmentShaderPreprocessed,
+                                                                            shaderc_shader_kind::shaderc_fragment_shader, false);
+
+  vertShaderModUnique = ShaderUtils::createShader(logicalDevice, *vertexSpvByteCode);
+  vertShaderModUnique = ShaderUtils::createShader(logicalDevice, *fragmentSpvByteCode);
+
+}
+
 int main() {
+
   createWindow();
 
   enableRequiredExtensions();
@@ -234,6 +255,7 @@ int main() {
   createSurface();
   pickDevice();
   createSwapChain();
+  createShaders();
   while (!glfwWindowShouldClose(window->glfwWindow)) {
     glfwPollEvents();
   }
