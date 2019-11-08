@@ -1,10 +1,12 @@
 #include "main.h"
+
+#include <filesystem>
+
+#include <shaderc/shaderc.hpp>
+
+#include "Macros.h"
 #include "DeviceUtils.h"
 #include "ShaderUtils.h"
-
-#ifndef NDEBUG
-#define DEBUG
-#endif
 
 void initVk() {
   try {
@@ -125,10 +127,10 @@ void pickDevice() {
   for (std::size_t i = 0; i < queueFamilyProps.size(); ++i) {
     std::cout << "\tindex: " << i << std::endl;
     std::cout << "\tgraphics: "
-              << static_cast<bool>(queueFamilyProps[static_cast<uint32_t>(i)].queueFlags & vk::QueueFlagBits::eGraphics)
+              << static_cast<bool>(queueFamilyProps[uint32(i)].queueFlags & vk::QueueFlagBits::eGraphics)
               << std::endl;
     std::cout << "\tpresentation: "
-              << physicalDevice.getSurfaceSupportKHR(static_cast<uint32_t>(i), uniqueSurface.get()) << std::endl;
+              << physicalDevice.getSurfaceSupportKHR(uint32(i), uniqueSurface.get()) << std::endl;
   }
 #endif
 
@@ -227,22 +229,10 @@ void cleanup() {
 }
 
 void createShaders() {
-  std::unique_ptr<std::string> vertexSrc = ShaderUtils::load("..\\shaders\\vertex.vert");
-  std::unique_ptr<std::string> fragmentSrc = ShaderUtils::load("..\\shaders\\fragment.frag");
-
-  std::unique_ptr<std::string> vertexShaderPreprocessed = ShaderUtils::preprocess("vertex.vert", *vertexSrc,
-                                                                          shaderc_shader_kind::shaderc_vertex_shader);
-  std::unique_ptr<std::string> fragmentShaderPreprocessed = ShaderUtils::preprocess("fragment.frag", *fragmentSrc,
-                                                                          shaderc_shader_kind::shaderc_fragment_shader);
-
-  std::unique_ptr<std::vector<uint32_t>> vertexSpvByteCode = ShaderUtils::compile("vertex.vert", *vertexShaderPreprocessed,
-                                                                            shaderc_shader_kind::shaderc_vertex_shader, false);
-  std::unique_ptr<std::vector<uint32_t>> fragmentSpvByteCode = ShaderUtils::compile("fragment.frag", *fragmentShaderPreprocessed,
-                                                                            shaderc_shader_kind::shaderc_fragment_shader, false);
-
-  vertShaderModUnique = ShaderUtils::createShader(logicalDevice, *vertexSpvByteCode);
-  vertShaderModUnique = ShaderUtils::createShader(logicalDevice, *fragmentSpvByteCode);
-
+  vertShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
+      "shaders").append("vertex.vert"), shaderc_shader_kind::shaderc_vertex_shader);
+  fragShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
+      "shaders").append("fragment.frag"), shaderc_shader_kind::shaderc_fragment_shader);
 }
 
 int main() {

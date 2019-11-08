@@ -1,24 +1,25 @@
-//#pragma clang diagnostic push
-//#pragma ide diagnostic ignored "cert-err58-cpp"
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-err58-cpp"
 #ifndef VULKAN_MAIN_H
 #define VULKAN_MAIN_H
 
 #include <iostream>
 #include <memory>
-
-#include <vulkan/vulkan.hpp>
-
-// This must be included after vulkan.hpp
-#include "Window.h"
-
-#include "SwapChainUtils.h"
-
-#include <GLFW/glfw3.h>
-#include "VkUtils.h"
+#include <string>
+#include <filesystem>
 #include <set>
 #include <vector>
 #include <experimental/vector>
 #include <string_view>
+
+#include <vulkan/vulkan.hpp>
+
+#include <GLFW/glfw3.h>
+
+// This must be included after vulkan.hpp
+#include "Window.h"
+#include "SwapChainUtils.h"
+#include "VkUtils.h"
 
 vk::UniqueInstance vkInstance;
 vk::PhysicalDevice physicalDevice;
@@ -70,4 +71,4 @@ int main();
 
 #endif
 
-//#pragma clang diagnostic pop
+#pragma clang diagnostic pop

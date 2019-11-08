@@ -1,7 +1,11 @@
 #ifndef VULKAN_SWAPCHAINUTILS_H
 #define VULKAN_SWAPCHAINUTILS_H
 
+#include <vector>
+
 #include <vulkan/vulkan.hpp>
+
+#include "Macros.h"
 
 struct SwapChainSupportDetails {
   vk::SurfaceCapabilitiesKHR capabilities;
@@ -18,7 +22,8 @@ public:
     std::vector<vk::UniqueImageView> imageViews(images.size());
     for (const auto& image : images) {
       vk::ImageViewCreateInfo createInfo = {{}, image, vk::ImageViewType::e2D, format, {},
-                                            {vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1}};
+                                            {vk::ImageAspectFlagBits::eColor, 0, 1, 0,
+                                             1}};
       imageViews.push_back(device->createImageViewUnique(createInfo));
     }
     return imageViews;
@@ -42,7 +47,7 @@ public:
                                              1,
                                              vk::ImageUsageFlagBits::eColorAttachment,
                                              sharedQueues ? vk::SharingMode::eExclusive : vk::SharingMode::eConcurrent,
-                                             static_cast<uint32_t>(sharedQueues ? 0 : 2),
+                                             uint32(sharedQueues ? 0 : 2),
                                              sharedQueues ? nullptr : queueFamilyIndices.data(),
                                              swapChainSupportDetails.capabilities.currentTransform,
                                              vk::CompositeAlphaFlagBitsKHR::eOpaque,

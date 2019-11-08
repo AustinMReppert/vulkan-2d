@@ -7,7 +7,7 @@ project(vulkan)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 
 # Specify the name of our application and its source files
-add_executable(vulkan main.cpp Window.h Window.cpp SwapChainUtils.h DeviceUtils.h main.h VkUtils.h ShaderUtils.h)
+add_executable(vulkan main.cpp Window.h Window.cpp SwapChainUtils.h DeviceUtils.h main.h VkUtils.h ShaderUtils.h Macros.h)
 
 # Enable c++ 20
 target_compile_features(vulkan PUBLIC cxx_std_20)

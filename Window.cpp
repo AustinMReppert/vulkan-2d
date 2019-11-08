@@ -1,6 +1,6 @@
 #include "Window.h"
 
-#include <GLFW/glfw3.h>
+#include "Macros.h"
 
 Window::Window() {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -49,11 +49,11 @@ Window::~Window() {
 uint32_t Window::getWidth() {
   int width, height;
   glfwGetWindowSize(glfwWindow, &width, &height);
-  return static_cast<uint32_t>(width);
+  return uint32(width);
 }
 
 uint32_t Window::getHeight() {
   int width, height;
   glfwGetWindowSize(glfwWindow, &width, &height);
-  return static_cast<uint32_t>(height);
+  return uint32(height);
 }

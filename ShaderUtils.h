@@ -7,6 +7,7 @@
 #include <string_view>
 #include <memory>
 #include <string>
+#include <filesystem>
 
 class ShaderUtils {
 
@@ -53,8 +54,23 @@ public:
   }
 
   static vk::UniqueShaderModule createShader(const vk::UniqueDevice& device, const std::vector<uint32_t>& spvByteCode) {
-    vk::ShaderModuleCreateInfo createInfo = {vk::ShaderModuleCreateFlags(), spvByteCode.size() * sizeof(uint32_t), spvByteCode.data()};
+    vk::ShaderModuleCreateInfo createInfo = {vk::ShaderModuleCreateFlags(), spvByteCode.size() * sizeof(uint32_t),
+                                             spvByteCode.data()};
     return device->createShaderModuleUnique(createInfo);
+  }
+
+  static vk::UniqueShaderModule createShader(const vk::UniqueDevice& device, const std::filesystem::path& path, const shaderc_shader_kind shaderKind, bool optimize = false) {
+    std::cout << path << std::endl;
+    std::unique_ptr<std::string> src = ShaderUtils::load(path.string());
+
+    std::unique_ptr<std::string> shaderPreprocessed = ShaderUtils::preprocess(path.filename(), *src,
+                                                                              shaderKind);
+
+    std::unique_ptr<std::vector<uint32_t>> spvByteCode = ShaderUtils::compile(path.filename(),
+                                                                              *shaderPreprocessed,
+                                                                              shaderKind, optimize);
+
+    return ShaderUtils::createShader(device, *spvByteCode);
   }
 
 protected:

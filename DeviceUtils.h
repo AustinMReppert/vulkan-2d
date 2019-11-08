@@ -8,6 +8,8 @@
 #include <experimental/vector>
 #include <optional>
 
+#include "Macros.h"
+
 class DeviceUtils {
 
 public:
@@ -37,7 +39,7 @@ public:
     std::vector<vk::QueueFamilyProperties> queueFamilyProperties = physicalDevice.getQueueFamilyProperties();
     uint32_t graphicsQueueFamilyIndex = queueFamilyProperties.size();
     uint32_t presentQueueFamilyIndex = queueFamilyProperties.size();
-    for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); ++i) {
+    for (uint32_t i = 0; i < uint32(queueFamilyProperties.size()); ++i) {
       if (queueFamilyProperties[i].queueFlags & vk::QueueFlagBits::eGraphics)
         graphicsQueueFamilyIndex = i;
       if (physicalDevice.getSurfaceSupportKHR(i, surface.get()))
@@ -46,10 +48,10 @@ public:
       ++i;
     }
     std::set<std::optional<uint32_t>> ret;
-    if (graphicsQueueFamilyIndex != static_cast<uint32_t>(queueFamilyProperties.size()))
+    if (graphicsQueueFamilyIndex != uint32(queueFamilyProperties.size()))
       ret.insert({graphicsQueueFamilyIndex});
     else ret.insert({});
-    if (presentQueueFamilyIndex != static_cast<uint32_t>(queueFamilyProperties.size()))
+    if (presentQueueFamilyIndex != uint32(queueFamilyProperties.size()))
       ret.insert({presentQueueFamilyIndex});
     else ret.insert({});
     return ret;
