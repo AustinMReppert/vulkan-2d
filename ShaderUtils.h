@@ -18,8 +18,8 @@ public:
     file.seekg(0);
     auto rawSrc = new std::vector<char>(fileSize + 1);
     file.read(rawSrc->data(), fileSize);
-    (*rawSrc)[fileSize] = '\0';
     file.close();
+    (*rawSrc)[fileSize] = '\0';
     std::unique_ptr<std::string> src = std::make_unique<std::string>(std::string(rawSrc->data()));
     delete rawSrc;
     return src;
@@ -59,14 +59,19 @@ public:
     return device->createShaderModuleUnique(createInfo);
   }
 
-  static vk::UniqueShaderModule createShader(const vk::UniqueDevice& device, const std::filesystem::path& path, const shaderc_shader_kind shaderKind, bool optimize = false) {
-    std::cout << path << std::endl;
+  static vk::UniqueShaderModule
+  createShader(const vk::UniqueDevice& device, const fs::path& path, const shaderc_shader_kind shaderKind,
+               bool optimize = false) {
+    if(!fs::exists(path)) {
+      std::string message = path.string() + " not found";
+      throw std::exception(message.c_str());
+    }
     std::unique_ptr<std::string> src = ShaderUtils::load(path.string());
 
-    std::unique_ptr<std::string> shaderPreprocessed = ShaderUtils::preprocess(path.filename(), *src,
+    std::unique_ptr<std::string> shaderPreprocessed = ShaderUtils::preprocess(path.filename().string(), *src,
                                                                               shaderKind);
 
-    std::unique_ptr<std::vector<uint32_t>> spvByteCode = ShaderUtils::compile(path.filename(),
+    std::unique_ptr<std::vector<uint32_t>> spvByteCode = ShaderUtils::compile(path.filename().string(),
                                                                               *shaderPreprocessed,
                                                                               shaderKind, optimize);
 

@@ -229,10 +229,28 @@ void cleanup() {
 }
 
 void createShaders() {
-  vertShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
-      "shaders").append("vertex.vert"), shaderc_shader_kind::shaderc_vertex_shader);
-  fragShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
-      "shaders").append("fragment.frag"), shaderc_shader_kind::shaderc_fragment_shader);
+  try {
+    vertShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
+        "shaders").append("vertex.vert"), shaderc_shader_kind::shaderc_vertex_shader);
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    exit(1);
+  }
+  try {
+    fragShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
+        "shaders").append("fragment.frag"), shaderc_shader_kind::shaderc_fragment_shader);
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    cleanup();
+    exit(1);
+  }
+  vk::PipelineShaderStageCreateInfo shaderStageCreateInfos[] = {{{}, vk::ShaderStageFlagBits::eVertex,   vertShaderModUnique.get(), "main", nullptr},
+                                                                {{}, vk::ShaderStageFlagBits::eFragment, fragShaderModUnique.get(), "main", nullptr}};
+
+}
+
+void createPipeline() {
+  vk::PipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {{}, 0, nullptr, 0, nullptr};
 }
 
 int main() {
@@ -246,6 +264,7 @@ int main() {
   pickDevice();
   createSwapChain();
   createShaders();
+  createPipeline();
   while (!glfwWindowShouldClose(window->glfwWindow)) {
     glfwPollEvents();
   }

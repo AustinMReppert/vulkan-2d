@@ -1,5 +1,5 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cert-err58-cpp"
+//#pragma clang diagnostic push
+//#pragma ide diagnostic ignored "cert-err58-cpp"
 #ifndef VULKAN_MAIN_H
 #define VULKAN_MAIN_H
 
@@ -65,10 +65,12 @@ void createSwapChain();
 
 void createShaders();
 
+void createPipeline();
+
 void cleanup();
 
 int main();
 
 #endif
 
-#pragma clang diagnostic pop
+//#pragma clang diagnostic pop
