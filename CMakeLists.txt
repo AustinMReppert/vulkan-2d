@@ -18,8 +18,14 @@ target_include_directories(vulkan PRIVATE glm)
 # Tell cmake to find the vulkan sdk
 find_package(Vulkan REQUIRED)
 
-set(shaderc_SOURCE_DIR "C:\\VulkanSDK\\1.1.121.2\\shaderc")
-add_subdirectory(shaderc)
+if (UNIX)
+  get_filename_component(vulkan_home $ENV{VULKAN_SDK} DIRECTORY)
+  add_subdirectory(${vulkan_home}/source/shaderc/src ${CMAKE_CURRENT_BINARY_DIR}/shaderc)
+elseif (WIN32)
+  add_subdirectory($ENV{VULKAN_SDK}/shaderc)
+else ()
+  add_subdirectory(shaderc)
+endif ()
 
 # Add vulkan includes
 target_include_directories(vulkan PRIVATE Vulkan::Vulkan PUBLIC ${shaderc_SOURCE_DIR}/libshaderc_util/include)
