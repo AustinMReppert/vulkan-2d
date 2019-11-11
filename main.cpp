@@ -251,6 +251,36 @@ void createShaders() {
 
 void createPipeline() {
   vk::PipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {{}, 0, nullptr, 0, nullptr};
+  vk::PipelineInputAssemblyStateCreateInfo assemblyStateCreateInfo = {{}, vk::PrimitiveTopology::eTriangleList,
+                                                                      VK_FALSE};
+  vk::Viewport viewport = {0, 0, static_cast<float>(optimalExtent.width), static_cast<float>(optimalExtent.height), 0,
+                           1};
+  vk::Rect2D scissor = {{0, 0}, optimalExtent};
+  vk::PipelineViewportStateCreateInfo viewportStateCreateInfo = {{}, 1, &viewport, 1, &scissor};
+  vk::PipelineRasterizationStateCreateInfo pipelineRasterizationStateCreateInfo = {{}, VK_FALSE, VK_FALSE,
+                                                                                   vk::PolygonMode::eFill,
+                                                                                   vk::CullModeFlagBits::eBack,
+                                                                                   vk::FrontFace::eClockwise, 0, 0, 0,
+                                                                                   0, 1};
+  vk::PipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo = {{}, vk::SampleCountFlagBits::e1,
+                                                                               VK_FALSE, 0, nullptr, VK_FALSE,
+                                                                               VK_FALSE};
+  vk::PipelineColorBlendAttachmentState colorBlendAttachmentState = {VK_FALSE, vk::BlendFactor::eOne,
+                                                                     vk::BlendFactor::eZero, vk::BlendOp::eAdd,
+                                                                     vk::BlendFactor::eOne, vk::BlendFactor::eZero,
+                                                                     vk::BlendOp::eAdd, vk::ColorComponentFlagBits::eR |
+                                                                                        vk::ColorComponentFlagBits::eG |
+                                                                                        vk::ColorComponentFlagBits::eB |
+                                                                                        vk::ColorComponentFlagBits::eA};
+  std::array<float, 4> blendConstants = {0, 0, 0, 0};
+  vk::PipelineColorBlendStateCreateInfo colorBlendStateCreateInfo = {{}, VK_FALSE, vk::LogicOp::eCopy, 1,
+                                                                     &colorBlendAttachmentState, blendConstants};
+  vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {{}, 0, nullptr, 0, nullptr};
+  pipelineLayoutUnique = logicalDevice->createPipelineLayoutUnique(pipelineLayoutCreateInfo);
+
+#ifdef DEBUG
+  std::cout << "Fixed Function Pipeline setup" << std::endl;
+#endif
 }
 
 int main() {

@@ -39,6 +39,7 @@ vk::PresentModeKHR optimalPresentMode;
 vk::SurfaceFormatKHR optimalSurfaceFormat;
 vk::UniqueShaderModule vertShaderModUnique;
 vk::UniqueShaderModule fragShaderModUnique;
+vk::UniquePipelineLayout pipelineLayoutUnique;
 
 SwapChainSupportDetails swapChainSupportDetails;
 
