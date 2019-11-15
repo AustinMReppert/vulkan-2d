@@ -81,7 +81,7 @@ public:
   static vk::Extent2D
   getOptimalExtent(const SwapChainSupportDetails& swapChainSupportDetails, const VkExtent2D& preferredExtent) {
     // the window manager lets you choose
-    if (swapChainSupportDetails.capabilities.currentExtent == std::numeric_limits<uint32_t>::max())
+    if (swapChainSupportDetails.capabilities.currentExtent.width == std::numeric_limits<uint32_t>::max())
       return vk::Extent2D(std::clamp(preferredExtent.width,
                                      swapChainSupportDetails.capabilities.minImageExtent.width,
                                      swapChainSupportDetails.capabilities.maxImageExtent.width),

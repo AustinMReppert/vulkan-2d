@@ -40,6 +40,8 @@ vk::SurfaceFormatKHR optimalSurfaceFormat;
 vk::UniqueShaderModule vertShaderModUnique;
 vk::UniqueShaderModule fragShaderModUnique;
 vk::UniquePipelineLayout pipelineLayoutUnique;
+vk::UniqueRenderPass renderPassUnique;
+vk::UniquePipeline graphicsPipeLineUnique;
 
 SwapChainSupportDetails swapChainSupportDetails;
 
@@ -65,6 +67,8 @@ void createSurface();
 void createSwapChain();
 
 void createShaders();
+
+void createRenderPass();
 
 void createPipeline();
 

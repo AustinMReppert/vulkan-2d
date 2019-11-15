@@ -10,6 +10,9 @@ namespace fs = std::filesystem;
 #define DEBUG
 #endif
 
+// To avoid a win32 macro
+#undef max
+
 template<class T>
 constexpr uint32_t uint32(T t) {
   return static_cast<uint32_t>(t);

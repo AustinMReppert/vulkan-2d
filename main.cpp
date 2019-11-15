@@ -15,7 +15,7 @@ void initVk() {
     vk::InstanceCreateInfo createInfo({}, &applicationInfo, vk::size(enabledLayers), enabledLayers.data(),
                                       vk::size(enabledExtensions), enabledExtensions.data());
     vkInstance = vk::createInstanceUnique(createInfo);
-  } catch (const std::exception& e) {
+  } catch (const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     exit(-1);
   }
@@ -232,24 +232,27 @@ void createShaders() {
   try {
     vertShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
         "shaders").append("vertex.vert"), shaderc_shader_kind::shaderc_vertex_shader);
-  } catch (const std::exception& e) {
+  } catch (const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     exit(1);
   }
   try {
     fragShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
         "shaders").append("fragment.frag"), shaderc_shader_kind::shaderc_fragment_shader);
-  } catch (const std::exception& e) {
+  } catch (const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     cleanup();
     exit(1);
   }
-  vk::PipelineShaderStageCreateInfo shaderStageCreateInfos[] = {{{}, vk::ShaderStageFlagBits::eVertex,   vertShaderModUnique.get(), "main", nullptr},
-                                                                {{}, vk::ShaderStageFlagBits::eFragment, fragShaderModUnique.get(), "main", nullptr}};
 
 }
 
 void createPipeline() {
+  std::array<vk::PipelineShaderStageCreateInfo, 2> shaderStageCreateInfos = {
+      vk::PipelineShaderStageCreateInfo{{}, vk::ShaderStageFlagBits::eVertex, vertShaderModUnique.get(), "main",
+                                        nullptr},
+      {{}, vk::ShaderStageFlagBits::eFragment, fragShaderModUnique.get(), "main", nullptr}};
+
   vk::PipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {{}, 0, nullptr, 0, nullptr};
   vk::PipelineInputAssemblyStateCreateInfo assemblyStateCreateInfo = {{}, vk::PrimitiveTopology::eTriangleList,
                                                                       VK_FALSE};
@@ -281,6 +284,50 @@ void createPipeline() {
 #ifdef DEBUG
   std::cout << "Fixed Function Pipeline setup" << std::endl;
 #endif
+
+  vk::GraphicsPipelineCreateInfo graphicsPipelineCreateInfo = {{}, vk::size(shaderStageCreateInfos),
+                                                               shaderStageCreateInfos.data(),
+                                                               &vertexInputStateCreateInfo, &assemblyStateCreateInfo,
+                                                               nullptr, &viewportStateCreateInfo,
+                                                               &pipelineRasterizationStateCreateInfo,
+                                                               &pipelineMultisampleStateCreateInfo, nullptr,
+                                                               &colorBlendStateCreateInfo, nullptr,
+                                                               pipelineLayoutUnique.get(), renderPassUnique.get(), 0,
+                                                               VK_NULL_HANDLE, -1};
+
+  try {
+    graphicsPipeLineUnique = logicalDevice->createGraphicsPipelineUnique(VK_NULL_HANDLE, graphicsPipelineCreateInfo);
+  } catch (const std::runtime_error& e) {
+    std::cerr << e.what() << std::endl;
+    cleanup();
+  }
+
+#ifdef DEBUG
+  std::cout << "Graphics Pipeline created" << std::endl;
+#endif
+
+}
+
+void createRenderPass() {
+  vk::AttachmentDescription colorAttachment = {{}, optimalSurfaceFormat.format, vk::SampleCountFlagBits::e1,
+                                               vk::AttachmentLoadOp::eClear, vk::AttachmentStoreOp::eStore,
+                                               vk::AttachmentLoadOp::eDontCare, vk::AttachmentStoreOp::eDontCare,
+                                               vk::ImageLayout::eUndefined, vk::ImageLayout::ePresentSrcKHR};
+  vk::AttachmentReference attachmentReference = {0, vk::ImageLayout::eColorAttachmentOptimal};
+  vk::SubpassDescription subpass = {{}, vk::PipelineBindPoint::eGraphics, 0, nullptr, 1, &attachmentReference,
+                                    nullptr,
+                                    nullptr, 0, nullptr};
+  vk::RenderPassCreateInfo renderPassCreateInfo = {{}, 1, &colorAttachment, 1, &subpass, 0, nullptr};
+  try {
+    renderPassUnique = logicalDevice->createRenderPassUnique(renderPassCreateInfo);
+  } catch (const std::runtime_error& e) {
+    std::cerr << e.what() << std::endl;
+    cleanup();
+    exit(1);
+  }
+#ifdef DEBUG
+  std::cout << "Render Pass created" << std::endl;
+#endif
 }
 
 int main() {
@@ -294,9 +341,11 @@ int main() {
   pickDevice();
   createSwapChain();
   createShaders();
+  createRenderPass();
   createPipeline();
   while (!glfwWindowShouldClose(window->glfwWindow)) {
     glfwPollEvents();
+    break;
   }
 
   cleanup();
