@@ -293,10 +293,10 @@ void createPipeline() {
                                                                &pipelineMultisampleStateCreateInfo, nullptr,
                                                                &colorBlendStateCreateInfo, nullptr,
                                                                pipelineLayoutUnique.get(), renderPassUnique.get(), 0,
-                                                               VK_NULL_HANDLE, -1};
+                                                               nullptr, -1};
 
   try {
-    graphicsPipeLineUnique = logicalDevice->createGraphicsPipelineUnique(VK_NULL_HANDLE, graphicsPipelineCreateInfo);
+    graphicsPipeLineUnique = logicalDevice->createGraphicsPipelineUnique(nullptr, graphicsPipelineCreateInfo);
   } catch (const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     cleanup();
@@ -342,12 +342,12 @@ int main() {
   createSwapChain();
   createShaders();
   createRenderPass();
-  createPipeline();
+  //createPipeline();
   while (!glfwWindowShouldClose(window->glfwWindow)) {
     glfwPollEvents();
-    break;
+    //break;
   }
-
+  std::cout << "exiting" << std::endl;
   cleanup();
   return 0;
 }

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(vulkan)
 
@@ -14,7 +14,7 @@ set(SHADERC_SKIP_TESTS ON CACHE BOOL "" FORCE)
 if (WIN32)
   add_subdirectory($ENV{VULKAN_SDK}/shaderc ${CMAKE_CURRENT_BINARY_DIR}/shaderc)
 elseif (UNIX)
-  add_subdirectory($ENV{VULKAN_SDK}source/shaderc/src ${CMAKE_CURRENT_BINARY_DIR}/shaderc)
+  add_subdirectory($ENV{VULKAN_SDK}/../source/shaderc/src ${CMAKE_CURRENT_BINARY_DIR}/shaderc)
 else ()
   add_subdirectory(shaderc)
 endif ()
