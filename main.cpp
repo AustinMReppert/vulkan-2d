@@ -68,7 +68,7 @@ void enableRequiredExtensions() {
 #endif
 
   std::size_t numExtensions = 0;
-  const char **glfwExtensions = glfwGetRequiredInstanceExtensions(reinterpret_cast<uint32_t *>(&numExtensions));
+  const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&numExtensions);
   for (std::size_t i = 0; i < numExtensions; ++i)
     enabledExtensions.push_back(glfwExtensions[i]);
 
@@ -342,7 +342,7 @@ int main() {
   createSwapChain();
   createShaders();
   createRenderPass();
-  //createPipeline();
+  createPipeline();
   while (!glfwWindowShouldClose(window->glfwWindow)) {
     glfwPollEvents();
     //break;

@@ -21,7 +21,7 @@ public:
     file.read(rawSrc->data(), fileSize);
     file.close();
     (*rawSrc)[fileSize] = '\0';
-    std::unique_ptr<std::string> src = std::make_unique<std::string>(std::string(rawSrc->data()));
+    std::unique_ptr<std::string> src = std::make_unique<std::string>(rawSrc->data());
     delete rawSrc;
     return src;
   }
@@ -36,7 +36,7 @@ public:
       std::cerr << res.GetErrorMessage() << std::endl;
       return std::make_unique<std::string>(nullptr);
     }
-    return std::make_unique<std::string>(std::string{res.begin(), res.end()});
+    return std::make_unique<std::string>(res.begin(), res.end());
   }
 
   static std::unique_ptr<std::vector<uint32_t>>
@@ -51,7 +51,7 @@ public:
       std::cerr << res.GetErrorMessage() << std::endl;
       return {};
     }
-    return std::make_unique<std::vector<uint32_t>>(std::vector<uint32_t>{res.begin(), res.end()});
+    return std::make_unique<std::vector<uint32_t>>(res.begin(), res.end());
   }
 
   static vk::UniqueShaderModule createShader(const vk::UniqueDevice& device, const std::vector<uint32_t>& spvByteCode) {
