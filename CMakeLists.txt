@@ -4,7 +4,7 @@ project(vulkan)
 
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 
-add_executable(vulkan main.cpp Window.h Window.cpp SwapChainUtils.h DeviceUtils.h main.h VkUtils.h ShaderUtils.h Macros.h)
+add_executable(vulkan Renderer.cpp Window.h Window.cpp SwapChainUtils.h DeviceUtils.h Renderer.h VkUtils.h ShaderUtils.h Macros.h main.cpp)
 
 target_compile_features(vulkan PUBLIC cxx_std_20)
 

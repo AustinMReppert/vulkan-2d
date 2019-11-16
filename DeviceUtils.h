@@ -14,9 +14,9 @@ class DeviceUtils {
 
 public:
 
-  static vk::PhysicalDevice getOptimalPhysicalDevice() {
+  static vk::PhysicalDevice getOptimalPhysicalDevice(const vk::UniqueInstance& uniqueInstance) {
     vk::PhysicalDevice physicalDevice;
-    auto physicalDevices = vkInstance->enumeratePhysicalDevices();
+    auto physicalDevices = uniqueInstance->enumeratePhysicalDevices();
     std::experimental::erase_if(physicalDevices,
                                 [](const auto& physicalDevice) {
                                   return physicalDevice.getProperties().deviceType !=
