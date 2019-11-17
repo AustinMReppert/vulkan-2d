@@ -4,11 +4,11 @@ project(vulkan)
 
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 
-add_executable(vulkan Renderer.cpp Window.h Window.cpp SwapChainUtils.h DeviceUtils.h Renderer.h VkUtils.h ShaderUtils.h Macros.h main.cpp)
+add_executable(vulkan src/Renderer.cpp src/Window.h src/Window.cpp src/SwapChainUtils.h src/DeviceUtils.h src/Renderer.h src/VkUtils.h src/ShaderUtils.h src/Macros.h src/main.cpp)
 
 target_compile_features(vulkan PUBLIC cxx_std_20)
 
-target_include_directories(vulkan PRIVATE glm)
+target_include_directories(vulkan PRIVATE third-party/glm)
 
 set(SHADERC_SKIP_TESTS ON CACHE BOOL "" FORCE)
 set(SHADERC_SKIP_INSTALL ON CACHE BOOL "" FORCE)
@@ -36,6 +36,8 @@ find_package(Vulkan REQUIRED)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(glfw)
+add_subdirectory(third-party/glfw)
 
 target_link_libraries(vulkan PRIVATE Vulkan::Vulkan PRIVATE glfw PRIVATE shaderc)
+
+file(COPY src/shaders DESTINATION ${CMAKE_BINARY_DIR})

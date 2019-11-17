@@ -57,3 +57,7 @@ uint32_t Window::getHeight() {
   glfwGetWindowSize(glfwWindow, &width, &height);
   return uint32(height);
 }
+
+bool Window::isClosing() {
+  return glfwWindowShouldClose(glfwWindow);
+}

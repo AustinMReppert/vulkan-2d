@@ -20,7 +20,7 @@ int main() {
   renderer.createPipeline();
   renderer.createFramebuffers();
 
-  while(!glfwWindowShouldClose(renderer.window->glfwWindow)) {
+  while(!renderer.window->isClosing()) {
     glfwPollEvents();
     break;
   }

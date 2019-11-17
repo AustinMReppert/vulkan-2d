@@ -24,6 +24,8 @@ public:
 
   void setTitle(const std::string_view& title);
 
+  bool isClosing();
+
   void zoom();
 
   void minimize();
