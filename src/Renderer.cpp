@@ -236,16 +236,17 @@ void Renderer::cleanup() {
 }
 
 void Renderer::createShaders() {
+  fs::path shaderPath = fs::current_path().append("shaders");
   try {
-    vertShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
-        "shaders").append("vertex.vert"), shaderc_shader_kind::shaderc_vertex_shader);
+    vertShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::path(shaderPath).append("vertex.vert"),
+                                                    shaderc_shader_kind::shaderc_vertex_shader);
   } catch(const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     exit(1);
   }
   try {
-    fragShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
-        "shaders").append("fragment.frag"), shaderc_shader_kind::shaderc_fragment_shader);
+    fragShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::path(shaderPath).append("fragment.frag"),
+                                                    shaderc_shader_kind::shaderc_fragment_shader);
   } catch(const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     cleanup();
