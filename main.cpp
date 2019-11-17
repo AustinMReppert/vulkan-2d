@@ -18,10 +18,12 @@ int main() {
   renderer.createShaders();
   renderer.createRenderPass();
   renderer.createPipeline();
+
   while (!glfwWindowShouldClose(renderer.window->glfwWindow)) {
     glfwPollEvents();
     break;
   }
+
   std::cout << "exiting" << std::endl;
   renderer.cleanup();
   return 0;

@@ -43,7 +43,7 @@ void Window::center() {
 }
 
 Window::~Window() {
-  //glfwDestroyWindow(glfwWindow);
+  glfwDestroyWindow(glfwWindow);
 }
 
 uint32_t Window::getWidth() {
