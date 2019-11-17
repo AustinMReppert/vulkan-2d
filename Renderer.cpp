@@ -15,7 +15,7 @@ void Renderer::initVk() {
     vk::InstanceCreateInfo createInfo({}, &applicationInfo, vk::size(enabledLayers), enabledLayers.data(),
                                       vk::size(enabledExtensions), enabledExtensions.data());
     vkInstance = vk::createInstanceUnique(createInfo);
-  } catch (const std::runtime_error& e) {
+  } catch(const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     exit(-1);
   }
@@ -36,7 +36,7 @@ void Renderer::enableRequiredDeviceExtensions(vk::PhysicalDevice device) {
 
 #ifdef DEBUG
   std::cout << "Supported device extensions:" << std::endl;
-  for (const auto& ext : deviceExtensions)
+  for(const auto& ext : deviceExtensions)
     std::cout << "\t" << ext.extensionName << std::endl;
 #endif
 
@@ -50,9 +50,9 @@ void Renderer::enableRequiredDeviceExtensions(vk::PhysicalDevice device) {
                      }) != deviceExtensionNames.end();
   });
 
-  if (!unsupportedExtensions.empty()) {
+  if(!unsupportedExtensions.empty()) {
     std::cerr << "Missing Device Extensions:" << std::endl;
-    for (const auto& i : unsupportedExtensions)
+    for(const auto& i : unsupportedExtensions)
       std::cerr << "\t" << i << std::endl;
     exit(-1);
   }
@@ -63,30 +63,30 @@ void Renderer::enableRequiredExtensions() {
 
 #ifdef DEBUG
   std::cout << "supported extensions:" << std::endl;
-  for (const auto& ext : supportedExtensions)
+  for(const auto& ext : supportedExtensions)
     std::cout << "\t" << ext.extensionName << std::endl;
 #endif
 
   std::size_t numExtensions = 0;
   const char **glfwExtensions = glfwGetRequiredInstanceExtensions(reinterpret_cast<uint32_t *>(&numExtensions));
-  for (std::size_t i = 0; i < numExtensions; ++i)
+  for(std::size_t i = 0; i < numExtensions; ++i)
     enabledExtensions.push_back(glfwExtensions[i]);
 
 #ifdef DEBUG
   std::cout << "GLFW requested the following extensions: " << std::endl;
-  for (const auto& ext : enabledExtensions)
+  for(const auto& ext : enabledExtensions)
     std::cout << "\t" << ext << std::endl;
 #endif
 
-  for (const auto& reqExt : enabledExtensions) {
+  for(const auto& reqExt : enabledExtensions) {
     bool found = false;
-    for (const auto& ext : supportedExtensions) {
-      if (!std::strcmp(ext.extensionName, reqExt)) {
+    for(const auto& ext : supportedExtensions) {
+      if(!std::strcmp(ext.extensionName, reqExt)) {
         found = true;
         break;
       }
     }
-    if (!found) {
+    if(!found) {
       std::cerr << reqExt << " not found, quiting." << std::endl;
       cleanup();
       exit(-1);
@@ -100,7 +100,7 @@ void Renderer::enableRequiredLayers() {
 #ifdef DEBUG
   enabledLayers.push_back("VK_LAYER_LUNARG_standard_validation");
   std::cout << "Supported Layers:" << std::endl;
-  for (const auto& layerProps : vkLayerProps)
+  for(const auto& layerProps : vkLayerProps)
     std::cout << "\t" << layerProps.layerName << std::endl;
 #endif
 
@@ -112,7 +112,7 @@ void Renderer::pickDevice() {
 
 #ifdef DEBUG
   std::cout << "Physical Devices: " << std::endl;
-  for (auto& device : physicalDevices)
+  for(auto& device : physicalDevices)
     std::cout << "\t" << device.getProperties().deviceName << std::endl;
 #endif
 
@@ -124,7 +124,7 @@ void Renderer::pickDevice() {
 #ifdef DEBUG
   std::vector<vk::QueueFamilyProperties> queueFamilyProps = physicalDevice.getQueueFamilyProperties();
   std::cout << "Queue Families:" << std::endl;
-  for (std::size_t i = 0; i < queueFamilyProps.size(); ++i) {
+  for(std::size_t i = 0; i < queueFamilyProps.size(); ++i) {
     std::cout << "\tindex: " << i << std::endl;
     std::cout << "\tgraphics: "
               << static_cast<bool>(queueFamilyProps[uint32(i)].queueFlags & vk::QueueFlagBits::eGraphics)
@@ -134,8 +134,8 @@ void Renderer::pickDevice() {
   }
 #endif
 
-  for (const std::optional<uint32_t>& queueFamilyIndex : queueFamilyIndices) {
-    if (queueFamilyIndex.has_value()) continue;
+  for(const std::optional<uint32_t>& queueFamilyIndex : queueFamilyIndices) {
+    if(queueFamilyIndex.has_value()) continue;
     std::cerr << "Could not find a queue family supporting graphics and/or presenting." << std::endl;
     cleanup();
     exit(-1);
@@ -147,8 +147,8 @@ void Renderer::pickDevice() {
   enableRequiredDeviceExtensions(physicalDevice);
   std::vector<vk::DeviceQueueCreateInfo> deviceQueueCreateInfos;
   std::vector<float *> queuePriorities;
-  for (const auto& queueFamilyIndex : queueFamilyIndices) {
-    float priority = 1;
+  float priority = 1;
+  for(const auto& queueFamilyIndex : queueFamilyIndices) {
     deviceQueueCreateInfos.push_back(vk::DeviceQueueCreateInfo({}, queueFamilyIndex.value(), 1, &priority));
   }
 
@@ -159,7 +159,7 @@ void Renderer::pickDevice() {
                                                                            enabledLayers.data(),
                                                                            vk::size(enabledDeviceExtensions),
                                                                            enabledDeviceExtensions.data()));
-  } catch (const std::runtime_error& e) {
+  } catch(const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     cleanup();
     exit(-1);
@@ -186,16 +186,16 @@ void Renderer::createSwapChain() {
                                               optimalPresentMode,
                                               optimalSurfaceFormat, optimalExtent, graphicsQueueFamilyIndex,
                                               presentQueueFamilyIndex);
-  for (const auto& swapChainImage : logicalDevice->getSwapchainImagesKHR(swapChain.get()))
+  for(const auto& swapChainImage : logicalDevice->getSwapchainImagesKHR(swapChain.get()))
     swapChainImages.push_back(swapChainImage);
   swapChainImageViews = SwapChainUtils::getImageViews(logicalDevice, swapChainImages, optimalSurfaceFormat.format);
 
 #ifdef DEBUG
   std::cout << "Supported Present Modes:" << std::endl;
-  for (const auto& presentMode : swapChainSupportDetails.presentModes)
+  for(const auto& presentMode : swapChainSupportDetails.presentModes)
     std::cout << "\t" << vk::to_string(presentMode) << std::endl;
   std::cout << "Supported Surface Formats:" << std::endl;
-  for (const auto& format : swapChainSupportDetails.formats) {
+  for(const auto& format : swapChainSupportDetails.formats) {
     std::cout << "\tformat: " << vk::to_string(format.format) << std::endl;
     std::cout << "\tcolor space: " << vk::to_string(format.colorSpace) << std::endl;
   }
@@ -222,11 +222,11 @@ void Renderer::createSurface() {
   auto res = static_cast<vk::Result>(glfwCreateWindowSurface(static_cast<VkInstance>(vkInstance.get()),
                                                              window->glfwWindow, nullptr,
                                                              reinterpret_cast<VkSurfaceKHR *>(&surface)));
-  if (res != vk::Result::eSuccess) {
+  if(res != vk::Result::eSuccess) {
     std::cerr << "Could not create surface to render to" << std::endl;
     cleanup();
     exit(-1);
-  } else {
+  } else{
     uniqueSurface = vk::UniqueSurfaceKHR(surface, vkInstance.get());
   }
 }
@@ -239,14 +239,14 @@ void Renderer::createShaders() {
   try {
     vertShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
         "shaders").append("vertex.vert"), shaderc_shader_kind::shaderc_vertex_shader);
-  } catch (const std::runtime_error& e) {
+  } catch(const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     exit(1);
   }
   try {
     fragShaderModUnique = ShaderUtils::createShader(logicalDevice, fs::current_path().parent_path().append(
         "shaders").append("fragment.frag"), shaderc_shader_kind::shaderc_fragment_shader);
-  } catch (const std::runtime_error& e) {
+  } catch(const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     cleanup();
     exit(1);
@@ -304,7 +304,7 @@ void Renderer::createPipeline() {
 
   try {
     graphicsPipeLineUnique = logicalDevice->createGraphicsPipelineUnique(nullptr, graphicsPipelineCreateInfo);
-  } catch (const std::runtime_error& e) {
+  } catch(const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     cleanup();
   }
@@ -327,7 +327,7 @@ void Renderer::createRenderPass() {
   vk::RenderPassCreateInfo renderPassCreateInfo = {{}, 1, &colorAttachment, 1, &subpass, 0, nullptr};
   try {
     renderPassUnique = logicalDevice->createRenderPassUnique(renderPassCreateInfo);
-  } catch (const std::runtime_error& e) {
+  } catch(const std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     cleanup();
     exit(1);
@@ -335,4 +335,24 @@ void Renderer::createRenderPass() {
 #ifdef DEBUG
   std::cout << "Render Pass created" << std::endl;
 #endif
+}
+
+void Renderer::createFramebuffers() {
+  frameBuffersUnique.resize(swapChainImageViews.size());
+  for(uint32_t i = 0; i < swapChainImageViews.size(); ++i) {
+    std::array<vk::ImageView, 1> attachments = {swapChainImageViews[i].get()};
+    vk::FramebufferCreateInfo framebufferCreateInfo = {{}, renderPassUnique.get(), attachments.size(),
+                                                       attachments.data(), optimalExtent.width, optimalExtent.height,
+                                                       1};
+    try {
+      frameBuffersUnique[i] = logicalDevice->createFramebufferUnique(framebufferCreateInfo);
+#ifdef DEBUG
+      std::cout << "frame buffer " << i << " created" << std::endl;
+#endif
+    } catch(const std::runtime_error& e) {
+      std::cerr << e.what() << std::endl;
+      cleanup();
+      exit(-1);
+    }
+  }
 }

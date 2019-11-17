@@ -33,6 +33,7 @@ public:
   vk::UniquePipelineLayout pipelineLayoutUnique;
   vk::UniqueRenderPass renderPassUnique;
   vk::UniquePipeline graphicsPipeLineUnique;
+  std::vector<vk::UniqueFramebuffer> frameBuffersUnique;
 
   vk::PhysicalDevice physicalDevice;
   std::vector<const char *> enabledExtensions;
@@ -92,6 +93,8 @@ public:
    * Cleans up any resource that are not automatically freed.
    */
   void cleanup();
+
+  void createFramebuffers();
 
 };
 

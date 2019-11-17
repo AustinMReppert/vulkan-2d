@@ -20,7 +20,7 @@ Window::Window(uint32_t width, uint32_t height) {
 
 void Window::zoom() {
   int maximized = glfwGetWindowAttrib(glfwWindow, GLFW_MAXIMIZED);
-  if (!maximized)
+  if(!maximized)
     glfwMaximizeWindow(glfwWindow);
   else
     glfwRestoreWindow(glfwWindow);

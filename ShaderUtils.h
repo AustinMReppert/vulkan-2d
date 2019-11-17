@@ -63,8 +63,8 @@ public:
   static vk::UniqueShaderModule
   createShader(const vk::UniqueDevice& device, const fs::path& path, const shaderc_shader_kind shaderKind,
                bool optimize = false) {
-    if(!fs::exists(path))
-      throw std::runtime_error( path.string() + " not found");
+    if (!fs::exists(path))
+      throw std::runtime_error(path.string() + " not found");
     std::unique_ptr<std::string> src = ShaderUtils::load(path.string());
 
     std::unique_ptr<std::string> shaderPreprocessed = ShaderUtils::preprocess(path.filename().string(), *src,

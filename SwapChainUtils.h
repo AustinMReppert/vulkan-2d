@@ -20,11 +20,11 @@ public:
   static std::vector<vk::UniqueImageView>
   getImageViews(const vk::UniqueDevice& device, const std::vector<vk::Image>& images, vk::Format format) {
     std::vector<vk::UniqueImageView> imageViews(images.size());
-    for (const auto& image : images) {
-      vk::ImageViewCreateInfo createInfo = {{}, image, vk::ImageViewType::e2D, format, {},
+    for (uint32_t i; i < images.size(); ++i) {
+      vk::ImageViewCreateInfo createInfo = {{}, images[i], vk::ImageViewType::e2D, format, {},
                                             {vk::ImageAspectFlagBits::eColor, 0, 1, 0,
                                              1}};
-      imageViews.push_back(device->createImageViewUnique(createInfo));
+      imageViews[i] = device->createImageViewUnique(createInfo);
     }
     return imageViews;
   }
