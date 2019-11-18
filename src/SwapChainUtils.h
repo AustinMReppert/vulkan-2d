@@ -1,6 +1,7 @@
 #ifndef VULKAN_SWAPCHAINUTILS_H
 #define VULKAN_SWAPCHAINUTILS_H
 
+#include <algorithm>
 #include <vector>
 
 #include <vulkan/vulkan.hpp>

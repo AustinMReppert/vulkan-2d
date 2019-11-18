@@ -3,7 +3,6 @@
 
 #include <filesystem>
 
-#define PS std::filesystem::path::preferred_separator
 namespace fs = std::filesystem;
 
 #ifndef NDEBUG

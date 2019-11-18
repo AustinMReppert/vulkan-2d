@@ -19,6 +19,8 @@ int main() {
   renderer.createRenderPass();
   renderer.createPipeline();
   renderer.createFramebuffers();
+  renderer.createCommandPool();
+  renderer.createCommandBuffers();
 
   while(!renderer.window->isClosing()) {
     glfwPollEvents();

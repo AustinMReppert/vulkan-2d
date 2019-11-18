@@ -1,14 +1,15 @@
 #ifndef VULKAN_RENDERER_H
 #define VULKAN_RENDERER_H
 
+#include <filesystem>
 #include <iostream>
 #include <memory>
-#include <string>
-#include <filesystem>
+#include <optional>
 #include <set>
+#include <string>
+#include <string_view>
 #include <vector>
 #include <experimental/vector>
-#include <string_view>
 
 #include <vulkan/vulkan.hpp>
 
@@ -34,6 +35,8 @@ public:
   vk::UniqueRenderPass renderPassUnique;
   vk::UniquePipeline graphicsPipeLineUnique;
   std::vector<vk::UniqueFramebuffer> frameBuffersUnique;
+  vk::UniqueCommandPool commandPoolUnique;
+  std::vector<vk::UniqueCommandBuffer> commandBuffersUnique;
 
   vk::PhysicalDevice physicalDevice;
   std::vector<const char *> enabledExtensions;
@@ -95,6 +98,12 @@ public:
   void cleanup();
 
   void createFramebuffers();
+
+  void createCommandPool();
+
+  void createCommandBuffers();
+
+  void render();
 
 };
 

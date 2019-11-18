@@ -357,3 +357,59 @@ void Renderer::createFramebuffers() {
     }
   }
 }
+
+void Renderer::createCommandPool() {
+  vk::CommandPoolCreateInfo commandPoolCreateInfo = {{}, graphicsQueueFamilyIndex};
+  try {
+    commandPoolUnique = logicalDevice->createCommandPoolUnique(commandPoolCreateInfo);
+#ifdef DEBUG
+    std::cout << "Command Pool created" << std::endl;
+#endif
+  } catch(const std::runtime_error& e) {
+    std::cerr << e.what() << std::endl;
+    cleanup();
+    exit(-1);
+  }
+}
+
+void Renderer::createCommandBuffers() {
+  vk::CommandBufferAllocateInfo allocateInfo = {commandPoolUnique.get(), vk::CommandBufferLevel::ePrimary,
+                                                swapChainImages.size()};
+  try {
+    commandBuffersUnique = logicalDevice->allocateCommandBuffersUnique(allocateInfo);
+#ifdef DEBUG
+    std::cout << "Created " << commandBuffersUnique.size() << " command buffers" << std::endl;
+#endif
+  } catch(const std::runtime_error& e) {
+    std::cerr << e.what() << std::endl;
+    cleanup();
+    exit(-1);
+  }
+  for(uint32_t i = 0; i < commandBuffersUnique.size(); ++i) {
+    try {
+      vk::CommandBufferBeginInfo commandBufferBeginInfo = {{}, nullptr};
+      commandBuffersUnique[i]->begin(commandBufferBeginInfo);
+#ifdef DEBUG
+      std::cout << "Began recording on command buffer " << i << std::endl;
+#endif
+      vk::ClearValue clearColor = {vk::ClearColorValue{std::array<float, 4>{0.0F, 0.0F, 0.0F, 1.0F}}};
+      vk::RenderPassBeginInfo renderPassBeginInfo = {renderPassUnique.get(), frameBuffersUnique[i].get(), {{}, optimalExtent}, 1,
+                                                     &clearColor};
+      commandBuffersUnique[i]->beginRenderPass(renderPassBeginInfo, vk::SubpassContents::eInline);
+#ifdef DEBUG
+      std::cout << "Began render pass on command buffer " << i << std::endl;
+#endif
+      commandBuffersUnique[i]->bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeLineUnique.get());
+      commandBuffersUnique[i]->draw(3, 1, 0, 0);
+      commandBuffersUnique[i]->endRenderPass();
+    } catch(const std::runtime_error& e) {
+      std::cerr << e.what() << std::endl;
+      cleanup();
+      exit(-1);
+    }
+  }
+}
+
+void Renderer::render() {
+
+}
